@@ -1,0 +1,9 @@
+github:
+  repoName: org/repo-name
+  token: GITHUB_ACCESS_TOKEN
+appServices:
+  prefixSecretName: AzureAppService_PublishProfile_
+  jobs:
+    - id: GIVING_NAME_OF_SECRET
+      name: web-app
+      resourceGroup: rg-web-app

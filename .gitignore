@@ -1,0 +1,18 @@
+.idea/*
+.nyc_output
+build
+node_modules
+test
+src/**.js
+coverage
+*.log
+package-lock.json
+dist
+*.tsbuildinfo
+
+# settings.js
+*.config.yml
+
+# tmp
+tmp
+out.txt
