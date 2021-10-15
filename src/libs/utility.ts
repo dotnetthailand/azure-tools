@@ -9,7 +9,7 @@ export async function run(command: string, slient = false) {
     const childProcess = spawn(spawnCommand , spawnArgs, {encoding: 'utf8', maxBuffer: 200 * 1024} );
 
     childProcess.stdout.on('data', function (data: any) {
-      console.log('stdout: ' + data.toString());
+      console.log(data.toString());
     });
 
     childProcess.stderr.on('data', function (data: any) {

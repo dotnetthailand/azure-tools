@@ -9,6 +9,11 @@ import ISettings, { IJob } from './interfaces/ISettings';
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
+const ACTION = {
+  REMOVE: 'REMOVE',
+  SET: 'SET'
+}
+
 const defaultUnicode = 'utf8';
 const tmpDir = 'tmp';
 
@@ -16,66 +21,117 @@ program
   .description('An application for copying publish profiles from Azure App Service to GitHub Secret')
   .option('-f, --file <directory>', 'Config file (Default is secret.config.yml')
   .option('-m, --mock', 'Enable mock mode')
+  .option('-r, --remove', 'Remove all Config in Github Secret')
   .option('-v, --verbose', 'Enable verbose mode');
 
 program.parse();
 
 const opts = program.opts();
 const options = {
-  mockMode: opts.mock ? true: false,
-  verboseMode: opts.verbose ? true: false,
-  file: opts.file ? opts.file: 'secret.config.yml',
+  mockMode: opts.mock ? true : false,
+  verboseMode: opts.verbose ? true : false,
+  file: opts.file ? opts.file : 'secret.config.yml',
+  action: opts.remove ? ACTION.REMOVE : ACTION.SET,
 }
 
 console.log('Options: ', program.opts());
 
 interface IBashScriptParams {
+  repoName: string;
   secretName: string;
-  appService: IJob;
+  appService?: IJob;
 }
-
-const generateBashScriptFilename = (secretID: string) => `${secretID}.sh`;
-const generateBashScript = ({
-  secretName, appService
-}: IBashScriptParams) => (
-  stripIndent`
-    #!/usr/bin/bash
-    az webapp deployment list-publishing-profiles \\
-      --name ${appService.name} \\
-      --resource-group ${appService.resourceGroup} \\
-      --xml > ${appService.id}.xml
-    gh auth login --with-token < ${path.resolve(tmpDir, 'github-token.txt' )}
-    gh auth status
-    gh secret set ${secretName} < ${appService.id}.xml
-  `
-)
 
 // Mock mode is not affect with remote repo.
 
-async function main(){
+// There are two mode: set secret and remove secret
+
+async function setSecretMode(secretName: string, job: IJob, config: ISettings) {
+  const generateBashScriptFilename = (secretID: string) => `${secretID}.sh`;
+  const generateBashScript = ({
+    secretName, appService, repoName
+  }: IBashScriptParams) => (
+    stripIndent`
+      #!/usr/bin/bash
+      az webapp deployment list-publishing-profiles \\
+        --name ${appService?.name} \\
+        --resource-group ${appService?.resourceGroup} \\
+        --xml > ${path.resolve(tmpDir, `${appService?.id}.xml`)}
+      gh auth login --with-token < ${path.resolve(tmpDir, 'github-token.txt')}
+      gh auth status
+      gh secret set ${secretName} --repo="${repoName}" < ${path.resolve(tmpDir, `${appService?.id}.xml`)}
+      `
+  );
+
+  await writeFile(
+    path.resolve(tmpDir, generateBashScriptFilename(job.id)),
+    generateBashScript({
+      repoName: config.github.repoName,
+      secretName,
+      appService: job
+    }),
+    defaultUnicode);
+  await run(`chmod a+x ${path.resolve(tmpDir, generateBashScriptFilename(job.id))}`, options.mockMode);
+  if (!options.mockMode)
+    await run(path.resolve(tmpDir, generateBashScriptFilename(job.id)));
+}
+
+async function removeSecretMode(secretName: string, job: IJob, config: ISettings) {
+  const generateBashScriptFilename = (secretID: string) => `${secretID}.sh`;
+  const generateBashScript = ({
+    secretName, repoName
+  }: IBashScriptParams) => (
+    stripIndent`
+      #!/usr/bin/bash
+      gh auth login --with-token < ${path.resolve(tmpDir, 'github-token.txt')}
+      gh auth status
+      gh secret remove ${secretName} --repo="${repoName}"
+    `
+  );
+
+  await writeFile(
+    path.resolve(tmpDir, generateBashScriptFilename(job.id)),
+    generateBashScript({
+      repoName: config.github.repoName,
+      secretName
+    }),
+    defaultUnicode);
+  await run(`chmod a+x ${path.resolve(tmpDir, generateBashScriptFilename(job.id))}`, options.mockMode);
+  if (!options.mockMode)
+    await run(path.resolve(tmpDir, generateBashScriptFilename(job.id)));
+}
+
+async function main() {
   const configFile = await readFile(path.resolve(options.file), defaultUnicode);
   const config = yaml.parse(configFile) as ISettings;
-  console.log(config)
+  if(options.verboseMode) console.log(config);
   const { jobs, prefixSecretName } = config.appServices;
   const { github } = config;
   await run(`mkdir -p ${tmpDir}`);
   await writeFile(path.resolve(tmpDir, 'github-token.txt'),
     github.token, defaultUnicode);
+  if(options.mockMode) console.log('Enable mock mode')
+  if(options.action === ACTION.SET){
+    console.log(`Start set secret mode at target repo "${config.github.repoName}"`)
+  } else {
+    console.log(`Start remove secret mode at target repo "${config.github.repoName}"`)
+  }
 
   for (const job of jobs) {
-    console.log(job);
-    await writeFile(
-      path.resolve(tmpDir, generateBashScriptFilename(job.id)),
-      generateBashScript({
-        secretName: `${prefixSecretName}${job.id}`,
-        appService: job
-      }),
-      defaultUnicode);
-      await run(`chmod a+x ${path.resolve(tmpDir, generateBashScriptFilename(job.id))}`, options.mockMode);
-      if(!options.mockMode)
-        await run(path.resolve(tmpDir, generateBashScriptFilename(job.id)));
+    if(options.verboseMode) console.log(job);
+    const secretName = `${prefixSecretName}${job.id}`;
+    if(options.action === ACTION.SET){
+      console.log(`[Set] '${secretName}' from ${job.resourceGroup}/${job.name}`);
+      setSecretMode(secretName, job, config);
+    } else {
+      // Remove Mode
+      console.log(`[Remove] '${secretName}' from ${job.resourceGroup}/${job.name}`);
+      removeSecretMode(secretName, job, config);
+    }
   }
 }
+
+console.log('Please make sure you run: `az login` Before run script')
 
 main();
 
