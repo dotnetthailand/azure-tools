@@ -12,7 +12,7 @@ dist
 
 # settings.js
 *.config.yml
-*.csv
+*.jobs.csv
 
 # tmp
 tmp

@@ -1,0 +1,2 @@
+﻿id,name,resourceGroup,subscription,slot
+webapp,webapp,rg-resourceGroup,default,staging

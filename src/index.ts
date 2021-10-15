@@ -53,11 +53,13 @@ const generateSetSecretBashScript = ({
   secretName, appService, repoName
 }: IBashScriptParams) => {
   const setSubscriptionCommand = appService?.subscription ? `az account set --subscription "${appService?.subscription}"` : 'echo "Using default subscription"';
+  const azSlotCommand = appService?.slot ? `--slot ${appService?.slot}` : '';
   return stripIndent`
     #!/usr/bin/bash
     echo "[Set] '${secretName}' from ${appService?.resourceGroup}/${appService?.name}"
     ${setSubscriptionCommand} && az webapp deployment list-publishing-profiles \\
       --name ${appService?.name} \\
+      ${azSlotCommand} \\
       --resource-group ${appService?.resourceGroup} \\
       --xml > ${path.resolve(tmpDir, `${appService?.id}.xml`)}
     gh auth login --with-token < ${path.resolve(tmpDir, 'github-token.txt')}
@@ -130,6 +132,7 @@ async function main() {
         name: rawRecord[1],
         resourceGroup: rawRecord[2],
         subscription: rawRecord[3],
+        slot: rawRecord[4],
       };
       jobs.push(job);
     });
@@ -140,11 +143,11 @@ async function main() {
     const envName = environment && environment !== '' ? `${environment}_` : '';
     const secretName = `${prefixSecretName}_${envName}${job.id}`;
     if (options.action === ACTION.SET) {
-      console.log(`[Set] '${secretName}' from ${job.resourceGroup}/${job.name}`);
+      console.log(`[Set] '${secretName}' from ${job.resourceGroup} / ${job.name}`);
       setSecretMode(secretName, job, config);
     } else {
       // Remove Mode
-      console.log(`[Remove] '${secretName}' from ${job.resourceGroup}/${job.name}`);
+      console.log(`[Remove] '${secretName}' from ${job.resourceGroup} / ${job.name}`);
       removeSecretMode(secretName, job, config);
     }
   }
