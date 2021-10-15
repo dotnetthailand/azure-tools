@@ -6,6 +6,7 @@ import yaml from 'yaml'
 import { program } from 'commander';
 import { run } from './libs/utility';
 import ISettings, { IJob } from './interfaces/ISettings';
+import { readCsv } from "./libs/csvUtils";
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
@@ -19,7 +20,8 @@ const tmpDir = 'tmp';
 
 program
   .description('An application for copying publish profiles from Azure App Service to GitHub Secret')
-  .option('-f, --file <directory>', 'Config file (Default is secret.config.yml')
+  .option('-f, --file <config>', 'Config file (Default is secret.config.yml')
+  .option('-c, --csv-file <CSV Job>', 'Config file for jobs')
   .option('-m, --mock', 'Enable mock mode')
   .option('-r, --remove', 'Remove all Config in Github Secret')
   .option('-v, --verbose', 'Enable verbose mode');
@@ -31,6 +33,7 @@ const options = {
   mockMode: opts.mock ? true : false,
   verboseMode: opts.verbose ? true : false,
   file: opts.file ? opts.file : 'secret.config.yml',
+  csvFile: opts.csvFile ? opts.csvFile : 'NO_IMPORT_CSV',
   action: opts.remove ? ACTION.REMOVE : ACTION.SET,
 }
 
@@ -96,7 +99,7 @@ async function removeSecretMode(secretName: string, job: IJob, config: ISettings
       secretName
     }),
     defaultUnicode);
-  await run(`chmod a+x ${path.resolve(tmpDir, generateBashScriptFilename(job.id))}`, options.mockMode);
+  await run(`chmod a+x "${path.resolve(tmpDir, generateBashScriptFilename(job.id))}"`, options.mockMode);
   if (!options.mockMode)
     await run(path.resolve(tmpDir, generateBashScriptFilename(job.id)));
 }
@@ -105,7 +108,7 @@ async function main() {
   const configFile = await readFile(path.resolve(options.file), defaultUnicode);
   const config = yaml.parse(configFile) as ISettings;
   if(options.verboseMode) console.log(config);
-  const { jobs, prefixSecretName } = config.appServices;
+  const { jobs = [], prefixSecretName, environment } = config.appServices;
   const { github } = config;
   await run(`mkdir -p ${tmpDir}`);
   await writeFile(path.resolve(tmpDir, 'github-token.txt'),
@@ -117,9 +120,25 @@ async function main() {
     console.log(`Start remove secret mode at target repo "${config.github.repoName}"`)
   }
 
+  // Import CSV as a job
+  if(options.csvFile !== 'NO_IMPORT_CSV'){
+    const records = await readCsv(options.csvFile);
+    records.shift();
+    if(options.verboseMode) console.log(records);
+    records.forEach((rawRecord: string[]) => {
+      const job: IJob = {
+        id: rawRecord[0],
+        name: rawRecord[1],
+        resourceGroup: rawRecord[2],
+      };
+      jobs.push(job);
+    });
+  }
+
   for (const job of jobs) {
     if(options.verboseMode) console.log(job);
-    const secretName = `${prefixSecretName}${job.id}`;
+    const envName = environment && environment !== '' ? `${environment}_` : '';
+    const secretName = `${prefixSecretName}_${envName}${job.id}`;
     if(options.action === ACTION.SET){
       console.log(`[Set] '${secretName}' from ${job.resourceGroup}/${job.name}`);
       setSecretMode(secretName, job, config);

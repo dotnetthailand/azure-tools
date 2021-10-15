@@ -2,7 +2,8 @@ export default interface ISettings {
   debug?: boolean;
   github: IGithubSettings;
   appServices: {
-    prefixSecretName: string;
+    prefixSecretName?: string;
+    environment?: string;
     jobs: IJob[];
   }
 }
