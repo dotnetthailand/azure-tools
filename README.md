@@ -33,10 +33,8 @@ yarn dev -f test.config.yml -r
 ## Use CSV file as a job
 
 ```
-yarn dev -f prod.config.yml -c prod-jobs.csv -m
-./tmp/run-all.sh 
-yarn dev -f uat.config.yml -c uat-jobs.csv
-./tmp/run-all.sh 
+yarn dev -f prod.config.yml -c prod-jobs.csv -m && ./tmp/run-all.sh 
+yarn dev -f uat.config.yml -c uat-jobs.csv && ./tmp/run-all.sh 
 ```
 
 # Bug

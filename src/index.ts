@@ -87,7 +87,6 @@ async function removeSecretMode(secretName: string, job: IJob, config: ISettings
     stripIndent`
       #!/usr/bin/bash
       gh auth login --with-token < ${path.resolve(tmpDir, 'github-token.txt')}
-      gh auth status
       gh secret remove ${secretName} --repo="${repoName}"
     `
   );
@@ -99,7 +98,7 @@ async function removeSecretMode(secretName: string, job: IJob, config: ISettings
       secretName
     }),
     defaultUnicode);
-  await run(`chmod a+x "${path.resolve(tmpDir, generateBashScriptFilename(job.id))}"`, options.mockMode);
+  await run(`chmod a+x ${path.resolve(tmpDir, generateBashScriptFilename(job.id))}`, options.mockMode);
   if (!options.mockMode)
     await run(path.resolve(tmpDir, generateBashScriptFilename(job.id)));
 }
