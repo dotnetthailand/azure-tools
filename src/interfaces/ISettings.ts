@@ -14,8 +14,10 @@ export interface IGithubSettings {
 }
 
 export interface IJob {
+  id: string;
   name: string;
   resourceGroup: string;
-  id: string;
+  // empty mean use default subscription
+  subscription?: string;
 }
 
