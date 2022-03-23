@@ -55,7 +55,7 @@ const generateSetSecretBashScript = ({
   const setSubscriptionCommand = appService?.subscription ? `az account set --subscription "${appService?.subscription}"` : 'echo "Using default subscription"';
   const azSlotCommand = appService?.slot ? `--slot ${appService?.slot}` : '';
   return stripIndent`
-    #!/usr/bin/bash
+    #!/bin/bash
     echo "[Set] '${secretName}' from ${appService?.resourceGroup}/${appService?.name}"
     ${setSubscriptionCommand} && az webapp deployment list-publishing-profiles \\
       --name ${appService?.name} \\
@@ -87,7 +87,7 @@ async function removeSecretMode(secretName: string, job: IJob, config: ISettings
     secretName, repoName
   }: IBashScriptParams) => (
     stripIndent`
-      #!/usr/bin/bash
+      #!/bin/bash
       gh auth login --with-token < ${path.resolve(tmpDir, 'github-token.txt')}
       gh secret remove ${secretName} --repo="${repoName}"
     `
@@ -152,7 +152,7 @@ async function main() {
     }
   }
 
-  let commands = "#!/usr/bin/bash\n";
+  let commands = "#!/bin/bash\n";
   for (const job of jobs) {
     commands += `${path.resolve(tmpDir, generateSetSecretBashScriptFilename(job.id))}\n`;
   }

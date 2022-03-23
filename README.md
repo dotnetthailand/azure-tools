@@ -16,6 +16,11 @@ Options:
   -h, --help                display help for command
 ```
 
+##  Personal Access Token
+
+Require: `read:org, repo`
+
+
 ## Mode
 
 set secret mode
@@ -42,4 +47,6 @@ yarn dev -f uat.config.yml -c uat.jobs.csv -m && ./tmp/run-all.sh
 - `No support space files`
 - az set subscription fail in nodejs subprocess
 
+# Todo
 
+- [ ] change deploymen slot from Blank string to `production`
