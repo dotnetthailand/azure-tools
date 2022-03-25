@@ -49,4 +49,4 @@ yarn dev -f uat.config.yml -c uat.jobs.csv -m && ./tmp/run-all.sh
 
 # Todo
 
-- [ ] change deploymen slot from Blank string to `production`
+- [ ] change deployment slot from Blank string to `production`
