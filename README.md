@@ -49,4 +49,6 @@ yarn dev -f uat.config.yml -c uat.jobs.csv -m && ./tmp/run-all.sh
 
 # Todo
 
-- [ ] change deployment slot from Blank string to `production`
+- [X] change deployment slot from Blank string to `production`
+- [ ] Migrate to Go Lang (v2 in `develop` branch)
+- [ ] Add Test
