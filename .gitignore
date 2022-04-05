@@ -17,3 +17,6 @@ dist
 # tmp
 tmp
 out.txt
+
+
+.DS_Store

@@ -4,9 +4,9 @@ import { promisify } from 'util';
 import { stripIndent } from 'common-tags';
 import yaml from 'yaml'
 import { program } from 'commander';
-import { run } from './libs/utility';
-import ISettings, { IJob } from './interfaces/ISettings';
-import { readCsv } from "./libs/csvUtils";
+import { run } from '../libs/utility';
+import ISettings, { IJob } from '../interfaces/ISettings';
+import { readCsv } from "../libs/csvUtils";
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 

@@ -16,8 +16,7 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "dev": "rm -rf ./tmp && ts-node ./src/index.ts",
-    "start": "ts-node ./src/index.ts"
+    "set-github-secrets": "rm -rf ./tmp && ts-node ./src/commands/set-github-secrets.ts"
   },
   "dependencies": {
     "commander": "^8.2.0",

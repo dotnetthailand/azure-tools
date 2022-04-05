@@ -26,20 +26,26 @@ Require: `read:org, repo`
 set secret mode
 
 ```sh
-yarn dev -f test.config.yml
+yarn set-github-secrets -f test.config.yml
 ```
 
 remove secret mode
 
 ```sh
-yarn dev -f test.config.yml -r
+yarn set-github-secrets -f test.config.yml -r
 ```
 
 ## Use CSV file as a job
 
 ```
-yarn dev -f prod.config.yml -c prod.jobs.csv -m && ./tmp/run-all.sh 
-yarn dev -f uat.config.yml -c uat.jobs.csv -m && ./tmp/run-all.sh 
+yarn set-github-secrets -f prod.config.yml -c prod.jobs.csv -m && ./tmp/run-all.sh 
+yarn set-github-secrets -f uat.config.yml -c uat.jobs.csv -m && ./tmp/run-all.sh 
+```
+
+## Convert from JSON to CSV and Yaml
+
+```
+dasel -r json -w yaml < deploy.json > jobs.yml
 ```
 
 # Bug
