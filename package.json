@@ -1,5 +1,5 @@
 {
-  "name": "migrate-gitlab-2-github",
+  "name": "azure-to-github",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Thada Wangthammang <thada.wth@gmail.com>",
@@ -9,6 +9,7 @@
     "@types/common-tags": "^1.8.1",
     "@types/isomorphic-fetch": "^0.0.35",
     "@types/node": "^16.9.0",
+    "npm-run-all": "^4.1.5",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   },
@@ -16,7 +17,9 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "set-github-secrets": "rm -rf ./tmp && ts-node ./src/commands/set-github-secrets.ts"
+    "clean": "rm -rf ./tmp",
+    "set-github-secrets": "npm run clean && ts-node ./src/commands/set-github-secrets.ts",
+    "set-deploy-slot": "npm run clean && ts-node ./src/commands/set-deploy-slot.ts"
   },
   "dependencies": {
     "commander": "^8.2.0",
@@ -25,5 +28,8 @@
     "isomorphic-fetch": "^3.0.0",
     "promisify-child-process": "^4.1.1",
     "yaml": "^1.10.2"
+  },
+  "ts-node": {
+    "swc": true
   }
 }

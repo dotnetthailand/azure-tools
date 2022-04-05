@@ -3,7 +3,7 @@
 ## Usage
 
 ```
-Usage: index [options]
+Usage: set-github-secrets [options]
 
 An application for copying publish profiles from Azure App Service to GitHub Secret
 

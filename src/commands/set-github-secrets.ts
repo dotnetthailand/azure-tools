@@ -53,7 +53,7 @@ const generateSetSecretBashScript = ({
   secretName, appService, repoName
 }: IBashScriptParams) => {
   const setSubscriptionCommand = appService?.subscription ? `az account set --subscription "${appService?.subscription}"` : 'echo "Using default subscription"';
-  const azSlotCommand = appService?.slot !== "production" ? `--slot ${appService?.slot}` : '';
+  const azSlotCommand = appService?.slot !== "production" && appService?.slot !== undefined ? `--slot ${appService?.slot}` : '';
   return stripIndent`
     #!/bin/bash
     echo "[Set] '${secretName}' from ${appService?.resourceGroup}/${appService?.name}"
