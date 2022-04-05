@@ -36,9 +36,9 @@ const options = {
 
 console.log('Options: ', program.opts());
 
-const generateBashScriptFilename = (name: string) => `${name}.sh`;
-const generateSetAppSettingBashScriptFilename = (name: string) => `set_${name}.sh`;
-const generateAppSettingsFilename = (name: string) => `appsettings_${name}.json`;
+const generateBashScriptFilename = ({name, slot}: ISetDeploySlotSetting) => `${name}_${slot}.sh`;
+const generateSetAppSettingBashScriptFilename = ({name, slot}: ISetDeploySlotSetting) => `set_${name}_${slot}.sh`;
+const generateAppSettingsFilename = ({name, slot}: ISetDeploySlotSetting) => `appsettings_${name}_${slot}.json`;
 
 const generateBashScript = (config: ISetDeploySlotSetting) => {
   const setSubscriptionCommand = config?.subscription ? `az account set --subscription "${config?.subscription}"` : 'echo "Using default subscription"';
@@ -50,7 +50,7 @@ const generateBashScript = (config: ISetDeploySlotSetting) => {
       --name ${config.name} \\
       --resource-group ${config.resourceGroup} \\
       ${azSlotCommand} \\
-      > ${path.resolve(tmpDir, generateAppSettingsFilename(config.name))}
+      > ${path.resolve(tmpDir, generateAppSettingsFilename(config))}
     `;
 }
   // az webapp config appsettings set -g MyResourceGroup -n MyUniqueApp --settings mySetting=value @moreSettings.json
@@ -65,22 +65,22 @@ const generateSetAppSettingBashScript = (config: ISetDeploySlotSetting) => {
       --name ${config.name} \\
       --resource-group ${config.resourceGroup} \\
       ${azSlotCommand} \\
-      --settings @${path.resolve(tmpDir, generateAppSettingsFilename(config.name))}
+      --settings @${path.resolve(tmpDir, generateAppSettingsFilename(config))}
     `;
 }
 
 async function setDeploySlot(config: ISetDeploySlotSetting) {
   await writeFile(
-    path.resolve(tmpDir, generateBashScriptFilename(config.name)),
+    path.resolve(tmpDir, generateBashScriptFilename(config)),
     generateBashScript(config),
     defaultUnicode);
-  await run(`chmod a+x ${path.resolve(tmpDir, generateBashScriptFilename(config.name))}`, options.mockMode);
+  await run(`chmod a+x ${path.resolve(tmpDir, generateBashScriptFilename(config))}`, options.mockMode);
   // if (!options.mockMode)
-  await run(path.resolve(tmpDir, generateBashScriptFilename(config.name)));
+  await run(path.resolve(tmpDir, generateBashScriptFilename(config)));
 
   // Replace slotSetting
   let appSettingsJson = JSON.parse(await readFile(
-    path.resolve(tmpDir, generateAppSettingsFilename(config.name)),
+    path.resolve(tmpDir, generateAppSettingsFilename(config)),
     defaultUnicode
   )) as IAppSetting[];
   appSettingsJson = appSettingsJson.map( appSetting => ({
@@ -89,19 +89,19 @@ async function setDeploySlot(config: ISetDeploySlotSetting) {
   }));
 
   await writeFile(
-    path.resolve(tmpDir, generateAppSettingsFilename(config.name)),
+    path.resolve(tmpDir, generateAppSettingsFilename(config)),
     JSON.stringify(appSettingsJson, null, 4),
     defaultUnicode
   );
 
   // Set App Setting
   await writeFile(
-    path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config.name)),
+    path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config)),
     generateSetAppSettingBashScript(config),
     defaultUnicode);
-  await run(`chmod a+x ${path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config.name))}`, options.mockMode);
+  await run(`chmod a+x ${path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config))}`, options.mockMode);
   if (!options.mockMode)
-    await run(path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config.name)));
+    await run(path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config)));
 }
 
 async function main() {
@@ -119,7 +119,7 @@ async function main() {
 
   let commands = "#!/bin/bash\n";
   for (const config of configs) {
-    commands += `${path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config.name))}\n`;
+    commands += `${path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config))}\n`;
   }
 
   await writeFile(path.resolve(tmpDir, 'run-all.sh'), commands, defaultUnicode);
