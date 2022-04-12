@@ -1,6 +1,6 @@
 # Set publish profile to yaml
 
-To download publiash profile from App Service and send the setting by particular key to yaml.
+To download publiash profile from App Service and send the setting by particular key to yaml file.
 
 **Use Case:** 
 1. Use [Mozilla SOPS](https://github.com/mozilla/sops) to encrypt the app service publish profil.

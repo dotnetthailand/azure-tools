@@ -2,8 +2,6 @@
 
 ## Usage
 
-
-
 ##  Personal Access Token
 
 Require: `read:org, repo`

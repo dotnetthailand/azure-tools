@@ -1,8 +1,8 @@
-# 
+# Set Deploy Slot
 
 ## Usage
 
-To set all `slotSetting` of App Setting of deployment slot settings to be `true`
+To set all `slotSetting` of App Setting of Azure App Service to be `true`
 
 App Setting
 
