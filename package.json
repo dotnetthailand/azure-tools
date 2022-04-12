@@ -19,7 +19,8 @@
   "scripts": {
     "clean": "rm -rf ./tmp",
     "set-github-secrets": "npm run clean && ts-node ./src/commands/set-github-secrets.ts",
-    "set-deploy-slot": "npm run clean && ts-node ./src/commands/set-deploy-slot.ts"
+    "set-deploy-slot": "npm run clean && ts-node ./src/commands/set-deploy-slot.ts",
+    "set-publish-profile-to-yaml": "npm run clean && ts-node ./src/commands/set-publish-profile-to-yaml.ts"
   },
   "dependencies": {
     "commander": "^8.2.0",

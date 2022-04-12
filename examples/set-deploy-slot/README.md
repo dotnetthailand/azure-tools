@@ -1,11 +1,33 @@
+# 
+
+## Usage
+
+To set all `slotSetting` of App Setting of deployment slot settings to be `true`
+
 App Setting
 
-```
+```bash
 yarn set-deploy-slot -f prod.set-deploy-slot.yml -m
+./tmp/run-all.sh
 ```
 
-Connection String (SQLServer)
+## CLI Options
 
 ```
-yarn set-deploy-slot -f prod.set-deploy-slot.yml --connection-string -m
+Usage: set-deploy-slot [options]
+
+An application for set deployment slot settings
+
+Options:
+  -f, --file <config>  Config file (Default is
+                       default.set-deploy-slot.yml
+  -m, --mock           Enable mock mode
+  -v, --verbose        Enable verbose mode
+  -h, --help           display help for command
+```
+
+## Clean all credential on local
+
+```bash
+yarn clean
 ```

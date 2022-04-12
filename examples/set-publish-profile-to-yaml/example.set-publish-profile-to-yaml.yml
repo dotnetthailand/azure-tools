@@ -1,0 +1,11 @@
+- name: web-app
+  resourceGroup: rg-web-app
+  subscription: default
+  slot: staging
+  property_path: .scope_a.app_service.app1
+
+- name: web-app-2
+  resourceGroup: rg-web-app
+  subscription: default
+  slot: staging
+  property_path: .scope_a.app_service.app2

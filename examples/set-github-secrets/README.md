@@ -2,24 +2,11 @@
 
 ## Usage
 
-```
-Usage: set-github-secrets [options]
 
-An application for copying publish profiles from Azure App Service to GitHub Secret
-
-Options:
-  -f, --file <config>       Config file (Default is secret.config.yml
-  -c, --csv-file <CSV Job>  Config file for jobs
-  -m, --mock                Enable mock mode
-  -r, --remove              Remove all Config in Github Secret
-  -v, --verbose             Enable verbose mode
-  -h, --help                display help for command
-```
 
 ##  Personal Access Token
 
 Require: `read:org, repo`
-
 
 ## Mode
 
@@ -42,4 +29,26 @@ yarn set-github-secrets -f test.config.yml -r
 ```
 yarn set-github-secrets -f prod.config.yml -c prod.jobs.csv -m && ./tmp/run-all.sh 
 yarn set-github-secrets -f uat.config.yml -c uat.jobs.csv -m && ./tmp/run-all.sh 
+```
+
+## CLI Options
+
+```
+Usage: set-github-secrets [options]
+
+An application for copying publish profiles from Azure App Service to GitHub Secret
+
+Options:
+  -f, --file <config>       Config file (Default is secret.config.yml
+  -c, --csv-file <CSV Job>  Config file for jobs
+  -m, --mock                Enable mock mode
+  -r, --remove              Remove all Config in Github Secret
+  -v, --verbose             Enable verbose mode
+  -h, --help                display help for command
+```
+
+## Clean all credential on local
+
+```bash
+yarn clean
 ```

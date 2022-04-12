@@ -13,6 +13,8 @@ dist
 # settings.js
 *.config.yml
 *.jobs.csv
+*.set-publish-profile-to-yaml.yml
+*.set-deploy-slot.yml
 
 # tmp
 tmp

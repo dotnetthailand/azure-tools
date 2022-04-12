@@ -1,4 +1,0 @@
-- name: web-app
-  resourceGroup: rg-web-app
-  subscription: default
-  slot: staging
