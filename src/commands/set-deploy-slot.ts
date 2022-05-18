@@ -41,30 +41,32 @@ const generateSetAppSettingBashScriptFilename = ({name, slot}: ISetDeploySlotSet
 const generateAppSettingsFilename = ({name, slot}: ISetDeploySlotSetting) => `appsettings_${name}_${slot}.json`;
 
 const generateBashScript = (config: ISetDeploySlotSetting) => {
-  const setSubscriptionCommand = config?.subscription ? `az account set --subscription "${config?.subscription}"` : 'echo "Using default subscription"';
+  const setSubscriptionCommand  = config?.subscription ? `--subscription "${config?.subscription}"` : '';
   const azSlotCommand = config?.slot !== "production" && config?.slot !== undefined ? `--slot ${config?.slot}` : '';
   return stripIndent`
     #!/bin/bash
     echo "[Get] App Settings '${config.name}' from resource group ${config?.resourceGroup}"
-    ${setSubscriptionCommand} && az webapp config appsettings list \\
+    az webapp config appsettings list \\
       --name ${config.name} \\
       --resource-group ${config.resourceGroup} \\
       ${azSlotCommand} \\
+      ${setSubscriptionCommand} \\
       > ${path.resolve(tmpDir, generateAppSettingsFilename(config))}
     `;
 }
   // az webapp config appsettings set -g MyResourceGroup -n MyUniqueApp --settings mySetting=value @moreSettings.json
 
 const generateSetAppSettingBashScript = (config: ISetDeploySlotSetting) => {
-  const setSubscriptionCommand = config?.subscription ? `az account set --subscription "${config?.subscription}"` : 'echo "Using default subscription"';
+  const setSubscriptionCommand  = config?.subscription ? `--subscription "${config?.subscription}"` : '';
   const azSlotCommand = config?.slot !== "production" && config?.slot !== undefined ? `--slot ${config?.slot}` : '';
   return stripIndent`
     #!/bin/bash
     echo "[Set] '${config.name}' from resource group ${config?.resourceGroup}"
-    ${setSubscriptionCommand} && az webapp config appsettings set \\
+    az webapp config appsettings set \\
       --name ${config.name} \\
       --resource-group ${config.resourceGroup} \\
       ${azSlotCommand} \\
+      ${setSubscriptionCommand} \\
       --settings @${path.resolve(tmpDir, generateAppSettingsFilename(config))}
     `;
 }
