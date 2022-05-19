@@ -15,6 +15,7 @@ dist
 *.jobs.csv
 *.set-publish-profile-to-yaml.yml
 *.set-deploy-slot.yml
+*.swap-deploy-slot.yml
 
 # tmp
 tmp
