@@ -76,10 +76,18 @@ async function _getSlotSetting(config: ISwapDeploySlotSettings, slot: string){
     path.resolve(tmpDir, generateAppSettingsFilename(config.name, slot)),
     defaultUnicode
   )) as IAppSetting[];
+  let isSafeToSwap = true;
   for(const appSetting of appSettingsJson){
-    // console.log(typeof appSetting.slotSetting)
-    if(appSetting.slotSetting == false)
-      console.log(chalk.red(`${config.name}: ${appSetting.name} => slotSetting = ${appSetting.slotSetting}`))
+    if(appSetting.slotSetting == false){
+      console.log(chalk.red(`${config.name} / ${slot}: ${appSetting.name} => slotSetting = ${appSetting.slotSetting}`))
+      isSafeToSwap = false;
+    }
+  }
+  if(isSafeToSwap){
+    console.log(chalk.gray(`${config.name} / ${slot}: Nothing swapping app setting`));
+  } else {
+    console.log(chalk.red(`--------------------------------------------------------------`));
+    console.log(chalk.red(`${config.name} / ${slot}: Please check SlotSetting again! Some app settings can be swapped between slots`));
   }
 }
 
