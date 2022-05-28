@@ -6,15 +6,10 @@ import yaml from 'yaml'
 import { program } from 'commander';
 import { run } from '../libs/utility';
 import { ISetDeploySlotSetting } from '../interfaces/ISetDeploySlotSettings';
-import { readCsv } from "../libs/csvUtils";
+import { IAppSetting } from '../interfaces/IAppSetting';
+
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
-
-interface IAppSetting {
-  name: string;
-  slotSetting: boolean;
-  value: string;
-}
 
 const defaultUnicode = 'utf8';
 const tmpDir = 'tmp';

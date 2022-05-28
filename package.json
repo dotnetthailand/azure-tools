@@ -24,6 +24,7 @@
     "set-publish-profile-to-yaml": "npm run clean && ts-node ./src/commands/set-publish-profile-to-yaml.ts"
   },
   "dependencies": {
+    "chalk": "^4.1.2",
     "commander": "^8.2.0",
     "common-tags": "^1.8.0",
     "csv-parse": "^4.16.3",
