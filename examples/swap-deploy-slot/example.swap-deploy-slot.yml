@@ -1,0 +1,10 @@
+- name: web-app
+  resourceGroup: rg-web-app
+  subscription: default
+  slot: staging
+  target_slot: production
+
+- name: web-app-2
+  resourceGroup: rg-web-app
+  slot: staging
+  target_slot: production
