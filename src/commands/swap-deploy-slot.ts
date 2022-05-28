@@ -36,10 +36,12 @@ const options = {
 
 console.log('Options: ', program.opts());
 
-const generateSetAppSettingBashScriptFilename = ({name, slot, target_slot}: ISwapDeploySlotSettings) => `swap_${name}_${slot}_to_${target_slot}.sh`;
+const generateSwapSlotBashScriptFilename = ({name, slot, target_slot}: ISwapDeploySlotSettings) => `swap_${name}_${slot}_to_${target_slot}.sh`;
 // const generateAppSettingsFilename = ({name, source_slot, target_slot}: ISwapDeploySlotSettings) => `appsettings_${name}_${slot}.json`;
 
-const generateSetAppSettingBashScript = (config: ISwapDeploySlotSettings) => {
+
+
+const generateSwapSlotBashScript = (config: ISwapDeploySlotSettings) => {
   const setSubscriptionCommand  = config?.subscription ? `--subscription "${config?.subscription}"` : '';
   // const azSlotCommand = config?.slot !== "production" && config?.slot !== undefined ? `--slot ${config?.slot}` : '';
   return stripIndent`
@@ -57,12 +59,12 @@ const generateSetAppSettingBashScript = (config: ISwapDeploySlotSettings) => {
 async function swapDeploySlot(config: ISwapDeploySlotSettings) {
   // Set App Setting
   await writeFile(
-    path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config)),
-    generateSetAppSettingBashScript(config),
+    path.resolve(tmpDir, generateSwapSlotBashScriptFilename(config)),
+    generateSwapSlotBashScript(config),
     defaultUnicode);
-  await run(`chmod a+x ${path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config))}`, options.mockMode);
+  await run(`chmod a+x ${path.resolve(tmpDir, generateSwapSlotBashScriptFilename(config))}`, options.mockMode);
   if (!options.mockMode)
-    await run(path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config)));
+    await run(path.resolve(tmpDir, generateSwapSlotBashScriptFilename(config)));
 }
 
 async function main() {
@@ -80,7 +82,7 @@ async function main() {
 
   let commands = "#!/bin/bash\n";
   for (const config of configs) {
-    commands += `${path.resolve(tmpDir, generateSetAppSettingBashScriptFilename(config))}\n`;
+    commands += `${path.resolve(tmpDir, generateSwapSlotBashScriptFilename(config))}\n`;
   }
 
   await writeFile(path.resolve(tmpDir, 'run-all.sh'), commands, defaultUnicode);
